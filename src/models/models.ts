@@ -1,7 +1,21 @@
-import { DataTypes } from 'sequelize'
+import { DataTypes, Model, Optional } from 'sequelize'
 import { sequelize } from '../db/db'
 
-export const User = sequelize.define('user', {
+type UserAttributes = {
+  id: number
+  email: string
+  password: string
+  role: 'User' | 'Admin'
+}
+
+interface UserCreationAttributes
+  extends Optional<UserAttributes, 'id' | 'role'> {}
+
+interface UserInstance
+  extends Model<UserAttributes, UserCreationAttributes>,
+    UserAttributes {}
+
+export const User = sequelize.define<UserInstance>('user', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   email: { type: DataTypes.STRING, unique: true },
   password: { type: DataTypes.STRING },
@@ -70,7 +84,7 @@ Rating.belongsTo(Device)
 Device.hasMany(BasketDevice)
 BasketDevice.belongsTo(Device)
 
-Device.hasMany(DeviceInfo, {as: 'info'})
+Device.hasMany(DeviceInfo, { as: 'info' })
 DeviceInfo.belongsTo(Device)
 
 Type.belongsToMany(Brand, { through: TypeBrand })
